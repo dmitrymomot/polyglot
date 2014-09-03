@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Lang as LangFacade;
 abstract class Polyglot extends Model
 {
 	/**
-	 * An array of polyglot attributes
+	 * The attributes to translate
 	 *
 	 * @var array
 	 */
@@ -25,7 +25,6 @@ abstract class Polyglot extends Model
 	protected static function boot()
 	{
 		static::saving(function ($model) {
-
 			$polyglotAttributes = $model->getPolyglotAttributes();
 
 			// Get the model's attributes
@@ -47,12 +46,12 @@ abstract class Polyglot extends Model
 			}
 
 			// Get the current lang and Lang model
-			$lang      = array_get($translated, 'lang', LangFacade::getLocale());
-			$langModel = $model->$lang;
+			$lang               = array_get($translated, 'lang', LangFacade::getLocale());
+			$langModel          = $model->$lang;
 			$translated['lang'] = $lang;
 
 			// Save new model
-			if (! $model->exists) {
+			if (!$model->exists) {
 				$model->save();
 			}
 
@@ -127,12 +126,13 @@ abstract class Polyglot extends Model
 	 *
 	 * @param  string $method
 	 * @param  array  $parameters
+	 *
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)
 	{
 		// If the model supports the locale, load it
-		if (in_array($method, $this->getLocales())) {
+		if (in_array($method, $this->getAvailable())) {
 			return $this->hasOne($this->getLangClass())->whereLang($method);
 		}
 
@@ -172,7 +172,7 @@ abstract class Polyglot extends Model
 		}
 
 		// If the model supports the locale, load and return it
-		if (in_array($key, $this->getLocales())) {
+		if (in_array($key, $this->getAvailable())) {
 			$relation = $this->hasOne($this->getLangClass())->whereLang($key);
 
 			if ($relation->getResults() === null) {
@@ -194,6 +194,7 @@ abstract class Polyglot extends Model
 				}
 
 				$lang = LangFacade::getLocale();
+
 				return $this->$lang ? $this->$lang->$key : null;
 			}
 		}
@@ -221,7 +222,7 @@ abstract class Polyglot extends Model
 		// Build lang arrays
 		foreach ($localization as $key => $value) {
 			foreach ($langs as $lang) {
-				${$lang}[$key] = array_get($value, $lang);
+				${$lang}[$key]   = array_get($value, $lang);
 				${$lang}['lang'] = $lang;
 			}
 		}
@@ -284,7 +285,7 @@ abstract class Polyglot extends Model
 	 *
 	 * @return array
 	 */
-	protected function getLocales()
+	protected function getAvailable()
 	{
 		return Config::get('polyglot::locales');
 	}

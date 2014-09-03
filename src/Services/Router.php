@@ -1,5 +1,5 @@
 <?php
-namespace Polyglot;
+namespace Polyglot\Services;
 
 use Closure;
 use Illuminate\Routing\Router as IlluminateRouter;
@@ -38,7 +38,7 @@ class Router extends IlluminateRouter
 	public function getRoutesPrefix($group = array())
 	{
 		// Get locale
-		$locale = $this->container['url']->locale();
+		$locale = $this->container['polyglot.url']->locale();
 
 		// Cancel if invalid locale in URL
 		if (!$this->container['translator']->valid($locale)) {
@@ -56,6 +56,7 @@ class Router extends IlluminateRouter
 		// Merge prefixes if necessary
 		if (isset($group['prefix'])) {
 			$locale = array($locale, $group['prefix']);
+			$locale = implode($locale, '/');
 		}
 
 		return array_merge($group, array('prefix' => $locale));

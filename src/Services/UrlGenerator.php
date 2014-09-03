@@ -1,5 +1,5 @@
 <?php
-namespace Polyglot;
+namespace Polyglot\Services;
 
 use Illuminate\Routing\UrlGenerator as IlluminateUrlGenerator;
 
@@ -15,7 +15,9 @@ class UrlGenerator extends IlluminateUrlGenerator
 	 */
 	public function locale()
 	{
-		return $this->request->segment(1);
+		$locale = $this->request->segment(1);
+
+		return strlen($locale) == 2 ? $locale : null;
 	}
 
 	/**
@@ -24,6 +26,7 @@ class UrlGenerator extends IlluminateUrlGenerator
 	 * @param  string $language
 	 * @param  mixed  $parameters
 	 * @param  bool   $secure
+	 *
 	 * @return string
 	 */
 	public function language($language, $parameters = array(), $secure = null)
@@ -37,6 +40,7 @@ class UrlGenerator extends IlluminateUrlGenerator
 	 * @param  string $language
 	 * @param  mixed  $parameters
 	 * @param  bool   $secure
+	 *
 	 * @return string
 	 */
 	public function switchLanguage($language, $parameters = array(), $secure = null)
